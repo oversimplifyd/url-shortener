@@ -1,4 +1,4 @@
 {
   "DBHost": "localhost:27017/url_shortener",
-  "HerokUrl": "localhost:8000"
+  "HerokUrl": "myshortenedurl.herokuapp.com"
 }
