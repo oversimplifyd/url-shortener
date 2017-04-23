@@ -1,0 +1,68 @@
+
+"use strict";
+
+let express = require('express'),
+    app = express(),
+    customValidator = require('./utils/validator'),
+    customError = require('./utils/error'),
+    controller = require('./controller/url'),
+    config = require('config'),
+    mongoose = require('mongoose'),
+    morgan = require('morgan'),
+    Url = require('./model/url'),
+    options = {
+        server: { socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 } },
+        replset: { socketOptions: { keepAlive: 1, connectTimeoutMS : 30000 } }
+    },
+    port = process.env.PORT || 8000;
+
+mongoose.connect(config.DBHost, options);
+console.log(config.DBHost);
+
+let db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+
+if(config.util.getEnv('NODE_ENV') !== 'test') {
+    app.use(morgan('combined'));
+}
+
+app.get('/', function(req, res){
+    res.send('Welcome to URL Shortener API');
+});
+
+app.get('/:urlKey(\\d{4})', function(req, res){
+    if (customValidator.validateUrlKey(req.params.urlKey)) {
+        let urlKey = req.params.urlKey,
+            result = controller.findByKey(urlKey);
+        if (result.err)
+            res.json(result.err);
+        res.redirect(result.data.url);
+    } else {
+        res.json(customError.urlKeyError);
+    }
+});
+
+app.get('/:url', function(req, res){
+    if (customValidator.validateUrl(req.params.url)) {
+      Url.findOne({url: req.params.url}, (err, data) => {
+
+        controller.checkKeyExists('1234');
+          //return err ? result.err = err : data ? result.data = data : result.data = UrlController.create(url);
+      });
+        //
+        // let url = (req.params.url).toLowerCase(),
+        //     result = controller.findOrCreate(url);
+        // if (result.err)
+        //     res.json(result.err);
+        // res.json({
+        //     "url": config.HerokUrl + '/' + result.data.urlKey
+        // })
+    } else {
+        res.json(customError.urlError);
+    }
+});
+
+app.listen(port);
+console.log("Listening on port " + port);
+
+module.exports = app;
