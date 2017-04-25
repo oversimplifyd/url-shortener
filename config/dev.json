@@ -1,4 +1,4 @@
 {
-    "DBHost": "localhost:27017/url_dev",
+    "DBHost": "mongodb://heroku_0mxj5c89:eee5hrd1u8188hgn9sg50qgdjd@ds115671.mlab.com:15671/heroku_0mxj5c89",
     "HerokUrl": "myshortenedurl.herokuapp.com"
 }
